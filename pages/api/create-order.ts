@@ -1,26 +1,120 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
-// Mock database (replace with Vercel Postgres in production)
-const orders: { [key: string]: { id: string; customerName: string; email: string; address: string; productId: string; status: string; createdAt: string } } = {};
+// Mock database (replace with real database in production)
+const orders: {
+  [key: string]: {
+    purchaseId: string;
+    productId: string;
+    productName: string;
+    amount: number;
+    telegramLink: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    telegramUsername: string;
+    customerAddress: string;
+    paymentStatus: string;
+    createdAt: string;
+  };
+} = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ success: false, error: "Method Not Allowed" });
   }
 
-  const { customerName, email, address, productId } = req.body;
+  const {
+    productId,
+    productName,
+    amount,
+    telegramLink,
+    customerName,
+    customerEmail,
+    customerPhone,
+    telegramUsername,
+    customerAddress,
+    purchaseId,
+    itemType,
+  } = req.body;
 
-  if (!customerName || !email || !address || !productId) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (
+    !productId ||
+    !productName ||
+    !amount ||
+    !telegramLink ||
+    !customerName ||
+    !customerEmail ||
+    !customerPhone ||
+    !telegramUsername ||
+    !customerAddress ||
+    !purchaseId ||
+    !itemType
+  ) {
+    return res.status(400).json({ success: false, error: "Missing required fields" });
   }
 
-  const orderId = uuidv4();
-  const order = { id: orderId, customerName, email, address, productId, status: "PENDING", createdAt: new Date().toISOString() };
+  // Save to mock database
+  orders[purchaseId] = {
+    purchaseId,
+    productId,
+    productName,
+    amount,
+    telegramLink,
+    customerName,
+    customerEmail,
+    customerPhone,
+    telegramUsername,
+    customerAddress,
+    paymentStatus: "unpaid",
+    createdAt: new Date().toISOString(),
+  };
 
-  // Store order in mock database
-  orders[orderId] = order;
-  console.log("Order created:", order);
+  const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-  res.status(200).json({ orderId });
+  try {
+    const response = await axios.post(
+      "https://api.cashfree.com/pg/orders",
+      {
+        order_id: orderId,
+        order_amount: amount,
+        order_currency: "INR",
+        customer_details: {
+          customer_id: `cust_${productId}`,
+          customer_name: customerName,
+          customer_email: customerEmail,
+          customer_phone: customerPhone,
+        },
+        order_meta: {
+          return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-result?purchase_id=${purchaseId}&item_type=${itemType}`,
+          notify_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhook`,
+        },
+        order_note: JSON.stringify({ telegramLink, telegramUsername, customerAddress, purchaseId }),
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-version": "2022-09-01",
+          "x-client-id": process.env.CASHFREE_APP_ID,
+          "x-client-secret": process.env.CASHFREE_SECRET_KEY,
+        },
+      }
+    );
+
+    const paymentSessionId = response.data.payment_session_id;
+
+    return res.status(200).json({
+      success: true,
+      paymentSessionId,
+      orderId,
+      purchaseId,
+    });
+  } catch (error: any) {
+    console.error("Cashfree order creation failed:", error?.response?.data || error.message);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to create Cashfree order",
+      details: error?.response?.data || error.message,
+    });
+  }
 }
