@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 const orders: {
   [key: string]: {
     purchaseId: string;
+    orderId: string; // Added to store Cashfree order_id
     productId: string;
     productName: string;
     amount: number;
@@ -77,6 +78,7 @@ export default function Checkout() {
       const purchaseId = `PURCHASE_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
       orders[purchaseId] = {
         purchaseId,
+        orderId: "", // Will be updated after order creation
         productId: productId as string,
         productName: productName as string,
         amount: parseFloat(amount as string),
@@ -133,11 +135,13 @@ export default function Checkout() {
       if (!window?.Cashfree || !paymentSessionId) {
         throw new Error("Cashfree SDK not loaded or session missing");
       }
+      // Update mock database with orderId
+      orders[purchaseId].orderId = orderId;
       const cashfree = window.Cashfree({ mode: "production" });
       cashfree.checkout({
         paymentSessionId,
         redirectTarget: "_self",
-        returnUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-result?purchase_id=${purchaseId}&item_type=product`,
+        returnUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-result?purchase_id=${purchaseId}&item_type=product&order_id=${orderId}`,
       });
       setFormData({
         customerName: "",
