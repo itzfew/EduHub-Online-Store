@@ -1,0 +1,18 @@
+.home-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.home-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.home-btn:active {
+  transform: translateY(0);
+}
