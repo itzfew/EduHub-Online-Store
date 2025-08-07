@@ -4,7 +4,7 @@ import Image from "next/image";
 import { GetStaticProps } from "next";
 import { useState } from "react";
 import Slider from "react-slick";
-import "../styles/home.css"; // Import custom CSS
+
 
 // Define interfaces for Product
 interface Product {
