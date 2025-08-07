@@ -1,19 +1,19 @@
 /* Navigation Bar */
 .nav-link {
-  color: white;
+  color: #000000; /* Black text */
   font-weight: 500;
   font-size: 1rem;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .nav-link:hover {
-  color: #dbeafe; /* Tailwind's blue-100 */
+  color: #4b5563; /* Tailwind's gray-600 */
   transform: translateY(-1px);
 }
 
 .nav-link:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
 }
 
 .hamburger-btn {
@@ -26,7 +26,7 @@
 }
 
 .hamburger-btn:hover {
-  color: #dbeafe;
+  color: #dbeafe; /* Tailwind's blue-100 */
 }
 
 .hamburger-btn:focus {
@@ -71,11 +71,25 @@
 /* Product Card */
 .product-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(180deg, #ffffff, #f8fafc); /* Subtle gradient */
+  border: 1px solid #e5e7eb; /* Tailwind's gray-200 */
 }
 
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Popular Card */
+.popular-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border: 1px solid #e5e7eb;
+}
+
+.popular-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .view-details-btn {
@@ -117,5 +131,10 @@
   .view-trending-btn {
     padding: 0.4rem 0.8rem;
     font-size: 0.75rem;
+  }
+
+  .product-card,
+  .popular-card {
+    padding: 0.75rem; /* Reduced padding on mobile */
   }
 }
