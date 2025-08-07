@@ -176,6 +176,33 @@
 .rating-star:hover {
   transform: scale(1.2);
 }
+/* Rating Stars */
+.rating-stars {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.rating-star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  color: var(--gray); /* Default gray color */
+}
+
+.rating-star:hover {
+  transform: scale(1.2);
+}
+
+/* When a star is selected, all stars up to it turn yellow */
+.rating-star.text-yellow-400 {
+  color: #f59e0b; /* Yellow color for selected stars */
+}
+
+/* Ensure hover effect doesn't override selected state */
+.rating-star.text-yellow-400:hover {
+  color: #f59e0b;
+}
 
 /* Purchase Button */
 .purchase-btn {
