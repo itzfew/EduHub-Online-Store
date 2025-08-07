@@ -5,7 +5,6 @@ import { GetStaticProps } from "next";
 import { useState } from "react";
 import Slider from "react-slick";
 
-
 // Define interfaces for Product
 interface Product {
   id: string;
@@ -42,10 +41,10 @@ export default function Home({ products }: HomeProps) {
   // Generate random rating (4.0 to 4.9)
   const getRandomRating = () => (4 + Math.random() * 0.9).toFixed(1);
 
-  // Select random products for trending slider
-  const trendingProducts = products
-    .sort(() => Math.random() - 0.5)
-    .slice(0, Math.min(5, products.length));
+  // Select random products for trending slider and popular section
+  const shuffledProducts = products.sort(() => Math.random() - 0.5);
+  const trendingProducts = shuffledProducts.slice(0, Math.min(5, products.length));
+  const popularProducts = shuffledProducts.slice(0, 4); // 4 for Popular section
 
   // Slider settings
   const sliderSettings = {
@@ -60,11 +59,11 @@ export default function Home({ products }: HomeProps) {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-100 ${inter.className}`}>
+    <div className={`min-h-screen bg-gray-50 ${inter.className}`}>
       {/* Navigation Bar */}
-      <header className="bg-blue-600 text-white p-4 sticky top-0 z-50 shadow-md">
+      <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Dealsbe - Software Deals</h1>
+          <h1 className="text-2xl font-bold">EduHub Online Store</h1>
           <nav className="hidden md:flex space-x-6">
             <Link href="/contact" className="nav-link">
               Contact
@@ -96,7 +95,7 @@ export default function Home({ products }: HomeProps) {
       </header>
 
       {/* Trending Products Slider */}
-      <section className="bg-gray-800 text-white py-2">
+      <section className="bg-gray-800 text-white py-3">
         <div className="container mx-auto">
           <h2 className="text-lg font-semibold text-center mb-2">Trending Products</h2>
           <Slider {...sliderSettings}>
@@ -114,10 +113,10 @@ export default function Home({ products }: HomeProps) {
         </div>
       </section>
 
-      {/* Main Content */}
-      <main className="container mx-auto p-4 sm:p-6">
-        <h2 className="text-xl font-semibold mb-6 text-center">Fresh Recommendations</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {/* Fresh Recommendations Section */}
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+        <h2 className="text-xl font-semibold mb-6 text-center text-gray-800">Fresh Recommendations</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <Link href={`/product/${product.id}`} key={product.id} className="block">
               <div className="product-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
@@ -128,14 +127,35 @@ export default function Home({ products }: HomeProps) {
                   height={200}
                   className="w-full h-48 object-cover mb-4 rounded-md"
                 />
-                <h3 className="text-lg font-semibold text-gray-800 truncate">{product.name}</h3>
-                <p className="text-gray-600 text-sm mb-2">{truncateDescription(product.description)}</p>
-                <p className="text-lg font-bold text-blue-600">₹{product.price.toFixed(2)}</p>
-                <div className="flex items-center mb-4">
-                  <span className="text-yellow-400">★★★★☆</span>
-                  <span className="ml-2 text-gray-600 text-sm">({getRandomRating()})</span>
+                <h3 className="text-lg font-semibold text-gray-800 truncate text-center">{product.name}</h3>
+                <div className="hidden sm:block">
+                  <p className="text-gray-600 text-sm mb-2 text-center">{truncateDescription(product.description)}</p>
+                  <p className="text-lg font-bold text-blue-600 text-center">₹{product.price.toFixed(2)}</p>
+                  <div className="flex items-center justify-center mb-4">
+                    <span className="text-yellow-400">★★★★☆</span>
+                    <span className="ml-2 text-gray-600 text-sm">({getRandomRating()})</span>
+                  </div>
                 </div>
                 <button className="view-details-btn w-full">View Details</button>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Popular Products Section */}
+        <h2 className="text-xl font-semibold mt-10 mb-6 text-center text-gray-800">Popular Products</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          {popularProducts.map((product) => (
+            <Link href={`/product/${product.id}`} key={product.id} className="block">
+              <div className="popular-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover mb-4 rounded-md"
+                />
+                <button className="view-details-btn w-full">View</button>
               </div>
             </Link>
           ))}
