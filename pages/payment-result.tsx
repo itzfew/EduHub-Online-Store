@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
-
+import jsPDF from "jspdf";
 
 // Product interface
 interface Product {
@@ -116,7 +116,7 @@ export default function PaymentResult() {
     }
   }, [router.isReady, purchase_id, item_type, order_id, products]);
 
-  // Generate and download receipt as LaTeX PDF
+  // Generate and download PDF receipt
   const handleDownloadReceipt = async () => {
     if (!orderDetails) {
       toast.error("Order details not available");
@@ -124,61 +124,74 @@ export default function PaymentResult() {
     }
 
     try {
-      // Generate LaTeX content for receipt with table and digital signature
-      const latexContent = `
-\\documentclass{article}
-\\usepackage[utf8]{inputenc}
-\\usepackage{geometry}
-\\geometry{a4paper, margin=1in}
-\\usepackage{fontspec}
-\\setmainfont{DejaVu Sans}
-\\usepackage{fancyhdr}
-\\usepackage{booktabs}
-\\usepackage{array}
-\\pagestyle{fancy}
-\\fancyhf{}
-\\fancyhead[C]{Payment Receipt}
-\\fancyfoot[C]{\\thepage}
-\\begin{document}
-\\begin{center}
-  \\textbf{\\Large Payment Receipt}\\\\
-  \\vspace{0.5cm}
-  EduHub Online Store\\\\
-  \\vspace{0.2cm}
-  \\small itzme.eduhub.contact@gmail.com
-\\end{center}
-\\vspace{0.5cm}
-\\noindent
-\\begin{tabular}{@{}>{\\bfseries}l p{4in}@{}}
-  \\toprule
-  Order ID & ${orderDetails.order_id} \\\\
-  Product ID & ${orderDetails.productId} \\\\
-  Amount & INR ${orderDetails.amount.toFixed(2)} \\\\
-  Customer Name & ${orderDetails.customerName} \\\\
-  Email & ${orderDetails.customerEmail} \\\\
-  Phone & ${orderDetails.customerPhone} \\\\
-  Date & ${new Date(orderDetails.createdAt).toLocaleDateString()} \\\\
-  \\bottomrule
-\\end{tabular}
-\\vspace{0.5cm}
-\\noindent
-\\textbf{Digitally Signed}\\\\
-EduHub Online Store\\\\
-Date: ${new Date().toLocaleDateString()}
-\\vspace{0.5cm}
-\\noindent
-Thank you for your purchase! For support, contact itzme.eduhub.contact@gmail.com.
-\\end{document}
-`;
+      const doc = new jsPDF();
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text("Payment Receipt", 105, 20, { align: "center" });
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text("EduHub Online Store", 105, 30, { align: "center" });
+      doc.text("itzme.eduhub.contact@gmail.com", 105, 35, { align: "center" });
 
-      // Create a Blob for the LaTeX content
-      const blob = new Blob([latexContent], { type: "text/latex" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `receipt_${orderDetails.order_id}.tex`;
-      link.click();
-      URL.revokeObjectURL(url);
+      // Table-like structure
+      doc.setFontSize(10);
+      const startY = 50;
+      const rowHeight = 10;
+      const labelX = 20;
+      const valueX = 80;
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Order ID:", labelX, startY);
+      doc.setFont("helvetica", "normal");
+      doc.text(orderDetails.order_id, valueX, startY);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Product ID:", labelX, startY + rowHeight);
+      doc.setFont("helvetica", "normal");
+      doc.text(orderDetails.productId, valueX, startY + rowHeight);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Amount:", labelX, startY + rowHeight * 2);
+      doc.setFont("helvetica", "normal");
+      doc.text(`INR ${orderDetails.amount.toFixed(2)}`, valueX, startY + rowHeight * 2);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Customer Name:", labelX, startY + rowHeight * 3);
+      doc.setFont("helvetica", "normal");
+      doc.text(orderDetails.customerName, valueX, startY + rowHeight * 3);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Email:", labelX, startY + rowHeight * 4);
+      doc.setFont("helvetica", "normal");
+      doc.text(orderDetails.customerEmail, valueX, startY + rowHeight * 4);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Phone:", labelX, startY + rowHeight * 5);
+      doc.setFont("helvetica", "normal");
+      doc.text(orderDetails.customerPhone, valueX, startY + rowHeight * 5);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Date:", labelX, startY + rowHeight * 6);
+      doc.setFont("helvetica", "normal");
+      doc.text(new Date(orderDetails.createdAt).toLocaleDateString(), valueX, startY + rowHeight * 6);
+
+      // Digital signature
+      doc.setFont("helvetica", "bold");
+      doc.text("Digitally Signed", 105, startY + rowHeight * 8, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.text("EduHub Online Store", 105, startY + rowHeight * 9, { align: "center" });
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 105, startY + rowHeight * 10, { align: "center" });
+
+      // Footer
+      doc.text(
+        "Thank you for your purchase! For support, contact itzme.eduhub.contact@gmail.com",
+        105,
+        startY + rowHeight * 12,
+        { align: "center" }
+      );
+
+      // Save PDF
+      doc.save(`receipt_${orderDetails.order_id}.pdf`);
       toast.success("Receipt downloaded successfully");
     } catch (error) {
       console.error("Failed to generate receipt:", error);
@@ -203,7 +216,7 @@ Thank you for your purchase! For support, contact itzme.eduhub.contact@gmail.com
                 <h2 className="text-xl font-semibold text-green-600 mb-4">Payment Successful!</h2>
                 <p className="text-gray-600 mb-4">Thank you for your purchase.</p>
                 {(product?.type === "ebook" && product?.url) || telegramLink ? (
-                  <div className="button-container flex justify-center gap-4 mb-4">
+                  <div className="button-container flex justify-center gap-4 mb-6">
                     {product?.type === "ebook" && product?.url && (
                       <a
                         href={product.url}
@@ -226,7 +239,7 @@ Thank you for your purchase! For support, contact itzme.eduhub.contact@gmail.com
                     )}
                   </div>
                 ) : null}
-                <div className="link-container flex justify-center gap-4 mt-4">
+                <div className="link-container flex justify-center gap-4 mt-6">
                   <Link href="/" className="home-link">
                     Back to Home
                   </Link>
@@ -239,7 +252,7 @@ Thank you for your purchase! For support, contact itzme.eduhub.contact@gmail.com
               <>
                 <h2 className="text-xl font-semibold text-red-600 mb-4">Payment Failed</h2>
                 <p className="text-gray-600 mb-4">Please try again or contact support.</p>
-                <div className="link-container flex justify-center gap-4 mt-4">
+                <div className="link-container flex justify-center gap-4 mt-6">
                   <Link href="/" className="home-link">
                     Back to Home
                   </Link>
