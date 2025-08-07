@@ -54,7 +54,6 @@ export default function Payment() {
 
     const initiatePayment = async () => {
       try {
-        // Fetch order details (in production, query from database)
         // For demo, we'll assume order exists
         const order: Order = { id: orderId as string, customerName: "", email: "", address: "", productId: products[0].id };
         const product = products.find((p) => p.id === order.productId);
@@ -75,11 +74,11 @@ export default function Payment() {
         if (data.paymentLink) {
           window.location.href = data.paymentLink; // Redirect to Cashfree
         } else {
-          setError("Failed to initiate payment");
+          setError(data.error || "Failed to initiate payment");
           setLoading(false);
         }
-      } catch (err) {
-        setError("An error occurred");
+      } catch (err: any) {
+        setError("An error occurred: " + (err.message || "Unknown error"));
         setLoading(false);
       }
     };
@@ -88,7 +87,16 @@ export default function Payment() {
   }, [orderId]);
 
   if (loading) {
-    return <div>Loading payment...</div>;
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <header className="bg-blue-600 text-white p-4">
+          <h1 className="text-2xl font-bold">Processing Payment</h1>
+        </header>
+        <main className="container mx-auto p-4">
+          <p>Loading payment...</p>
+        </main>
+      </div>
+    );
   }
 
   if (error) {
@@ -99,10 +107,25 @@ export default function Payment() {
         </header>
         <main className="container mx-auto p-4">
           <p className="text-red-500">{error}</p>
+          <button
+            onClick={() => router.push(`/checkout?productId=${products[0].id}`)}
+            className="mt-4 bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+          >
+            Try Again
+          </button>
         </main>
       </div>
     );
   }
 
-  return <div>Redirecting to payment...</div>;
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-blue-600 text-white p-4">
+        <h1 className="text-2xl font-bold">Redirecting</h1>
+      </header>
+      <main className="container mx-auto p-4">
+        <p>Redirecting to payment...</p>
+      </main>
+    </div>
+  );
 }
