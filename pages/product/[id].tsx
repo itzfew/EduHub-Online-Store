@@ -5,6 +5,9 @@ import { GetStaticProps, GetStaticPaths } from "next";
 import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 // Product interface
 interface Product {
@@ -45,7 +48,6 @@ const getRandomReviews = () => {
 
 export default function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter();
-  const [rating, setRating] = useState<number>(0);
   const [userRating, setUserRating] = useState<number>(0);
   const [randomRating, setRandomRating] = useState<string>("4.0");
 
@@ -65,35 +67,66 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     if (product) {
       setUserRating(value);
       localStorage.setItem(`rating_${product.id}`, value.toString());
-      toast.success("Rating saved!");
+      toast.success("Rating saved!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     }
   };
 
   if (!product) {
-    return <div className="text-center p-4">Product not found</div>;
+    return <div className="text-center p-4 text-gray-600">Product not found</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-blue-600 text-white p-4">
-        <h1 className="text-2xl font-bold text-center">Dealsbe - Software Deals</h1>
+    <div className={`min-h-screen bg-gray-100 ${inter.className}`}>
+      {/* Navigation Bar */}
+      <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sticky top-0 z-50 shadow-lg">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold">EduHub Online Store</h1>
+          <nav className="flex space-x-6">
+            <Link href="/contact" className="nav-link">
+              Contact
+            </Link>
+            <Link href="/terms" className="nav-link">
+              Terms and Conditions
+            </Link>
+            <Link href="/refund" className="nav-link">
+              Refund Policy
+            </Link>
+          </nav>
+        </div>
       </header>
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <Link href="/" className="text-blue-500 hover:underline mb-4 inline-block">
+      <main className="product-detail-container">
+        <Link href="/" className="back-link">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
           Back to Products
         </Link>
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex flex-col lg:flex-row gap-6">
+        <div className="product-card">
+          <div className="product-layout">
             <div className="lg:w-1/2">
               <Image
                 src={product.image}
                 alt={product.name}
                 width={500}
                 height={400}
-                className="w-full h-auto object-cover rounded-md mb-4"
+                className="product-main-image"
               />
               {product.preview.length > 0 && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="preview-grid">
                   {product.preview.map((img, index) => (
                     <Image
                       key={index}
@@ -101,28 +134,30 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                       alt={`Preview ${index + 1}`}
                       width={200}
                       height={150}
-                      className="w-full h-auto object-cover rounded-md"
+                      className="preview-image"
                     />
                   ))}
                 </div>
               )}
             </div>
-            <div className="lg:w-1/2">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h2>
-              <p className="text-gray-600 mb-4">{product.description}</p>
-              <p className="text-2xl font-bold text-blue-600 mb-4">₹{product.price.toFixed(2)}</p>
-              <div className="flex items-center mb-4">
-                <span className="text-yellow-400">★★★★☆</span>
-                <span className="ml-2 text-gray-600">({randomRating})</span>
+            <div className="product-info">
+              <h2 className="product-title">{product.name}</h2>
+              <p className="product-description">{product.description}</p>
+              <p className="product-price">₹{product.price.toFixed(2)}</p>
+              <div className="rating-container">
+                <span className="star-rating">★★★★☆</span>
+                <span className="rating-value">({randomRating})</span>
               </div>
-              <div className="mb-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Rate this product:</p>
-                <div className="flex gap-2">
+              <div className="user-rating">
+                <p className="rating-label">Rate this product:</p>
+                <div className="rating-stars">
                   {[1, 2, 3, 4, 5].map((value) => (
                     <button
                       key={value}
                       onClick={() => handleRating(value)}
-                      className={`rating-star ${userRating >= value ? "text-yellow-400" : "text-gray-300"}`}
+                      className={`rating-star ${
+                        userRating >= value ? "text-yellow-400" : "text-gray-300"
+                      }`}
                     >
                       ★
                     </button>
@@ -135,17 +170,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 )}&amount=${product.price}&telegramLink=${encodeURIComponent(product.telegramLink || "")}`}
               >
                 <button className="purchase-btn">Purchase Now</button>
-             obium
-
               </Link>
             </div>
           </div>
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Customer Reviews</h3>
-            <div className="space-y-2">
+          <div className="reviews-section">
+            <h3 className="reviews-title">Customer Reviews</h3>
+            <div className="review-list">
               {getRandomReviews().map((review, index) => (
-                <div key={index} className="bg-gray-100 p-3 rounded-md">
-                  <p className="text-gray-600 italic">"{review}"</p>
+                <div key={index} className="review-item">
+                  <p className="review-text">"{review}"</p>
                 </div>
               ))}
             </div>
