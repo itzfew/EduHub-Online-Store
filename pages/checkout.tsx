@@ -154,136 +154,132 @@ export default function Checkout() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <header className="bg-blue-600 text-white p-4">
-        <h1 className="text-2xl font-bold">Dealsbe - Checkout</h1>
+        <h1 className="text-2xl font-bold text-center">Dealsbe - Checkout</h1>
       </header>
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center sm:text-4xl">
-            Product Checkout
-          </h1>
-          <div className="max-w-lg mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Enter Your Details</h2>
-            <form onSubmit={handleProceedToPayment} className="space-y-5">
-              <div>
-                <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="customerName"
-                  name="customerName"
-                  value={formData.customerName}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="John Doe"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="customerEmail" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="customerEmail"
-                  name="customerEmail"
-                  value={formData.customerEmail}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="john@example.com"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone (10 digits)
-                </label>
-                <input
-                  type="tel"
-                  id="customerPhone"
-                  name="customerPhone"
-                  value={formData.customerPhone}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="1234567890"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="telegramUsername" className="block text-sm font-medium text-gray-700 mb-1">
-                  Telegram Username
-                </label>
-                <input
-                  type="text"
-                  id="telegramUsername"
-                  name="telegramUsername"
-                  value={formData.telegramUsername}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="@username"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="customerAddress" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address
-                </label>
-                <textarea
-                  id="customerAddress"
-                  name="customerAddress"
-                  value={formData.customerAddress}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Your full address"
-                  required
-                />
-              </div>
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Order Summary</h3>
-                <p className="text-gray-600"><strong>Product:</strong> {productName}</p>
-                <p className="text-gray-600"><strong>Amount:</strong> ₹{amount}</p>
-              </div>
-              <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-                <button
-                  type="button"
-                  onClick={() => router.back()}
-                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
-                    isLoading ? "opacity-75 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {isLoading ? (
-                    <span className="flex items-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : (
-                    <span>Proceed to Payment</span>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+      <main className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center sm:text-4xl">
+          Product Checkout
+        </h1>
+        <div className="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-6 sm:p-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">Enter Your Details</h2>
+          <form onSubmit={handleProceedToPayment} className="space-y-5">
+            <div>
+              <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
+              <input
+                type="text"
+                id="customerName"
+                name="customerName"
+                value={formData.customerName}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="customerEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                id="customerEmail"
+                name="customerEmail"
+                value={formData.customerEmail}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="john@example.com"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-700 mb-1">
+                Phone (10 digits)
+              </label>
+              <input
+                type="tel"
+                id="customerPhone"
+                name="customerPhone"
+                value={formData.customerPhone}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="1234567890"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="telegramUsername" className="block text-sm font-medium text-gray-700 mb-1">
+                Telegram Username
+              </label>
+              <input
+                type="text"
+                id="telegramUsername"
+                name="telegramUsername"
+                value={formData.telegramUsername}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="@username"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="customerAddress" className="block text-sm font-medium text-gray-700 mb-1">
+                Address
+              </label>
+              <textarea
+                id="customerAddress"
+                name="customerAddress"
+                value={formData.customerAddress}
+                onChange={handleInputChange}
+                className="input-field"
+                placeholder="Your full address"
+                required
+              />
+            </div>
+            <div className="order-summary bg-gray-100 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Order Summary</h3>
+              <p className="text-gray-600"><strong>Product:</strong> {productName}</p>
+              <p className="text-gray-600"><strong>Amount:</strong> ₹{amount}</p>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`proceed-btn ${isLoading ? "opacity-75 cursor-not-allowed" : ""}`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  <span>Proceed to Payment</span>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
         <ToastContainer />
       </main>
