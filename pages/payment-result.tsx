@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 
+// Product interface
 interface Product {
   id: string;
   name: string;
@@ -15,34 +16,29 @@ interface Product {
   telegramLink?: string;
 }
 
-const products: Product[] = [
-  {
-    id: "1",
-    name: "eBook: Learn Programming",
-    description: "Comprehensive guide to modern programming techniques.",
-    price: 29.99,
-    image: "/ebook.jpg",
-    type: "ebook",
-    url: "https://example.com/ebook-download.pdf",
-    telegramLink: "https://t.me/learnprogramming",
-  },
-  {
-    id: "2",
-    name: "Physical Book",
-    description: "Hardcover programming book.",
-    price: 49.99,
-    image: "/book.jpg",
-    type: "physical",
-    telegramLink: "https://t.me/booksupport",
-  },
-];
-
 export default function PaymentResult() {
   const router = useRouter();
   const { purchase_id, item_type } = router.query;
   const [status, setStatus] = useState<"loading" | "success" | "failed">("loading");
   const [product, setProduct] = useState<Product | null>(null);
   const [telegramLink, setTelegramLink] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    // Load products dynamically
+    const loadProducts = async () => {
+      try {
+        const productsData: Product[] = (await import("../data/products.json")).default;
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Failed to load products:", error);
+        toast.error("Failed to load product data");
+        setStatus("failed");
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     if (!purchase_id || item_type !== "product") {
@@ -70,8 +66,10 @@ export default function PaymentResult() {
       }
     };
 
-    checkPaymentStatus();
-  }, [purchase_id, item_type]);
+    if (products.length > 0) {
+      checkPaymentStatus();
+    }
+  }, [purchase_id, item_type, products]);
 
   if (status === "loading") {
     return (
