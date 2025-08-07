@@ -26,9 +26,6 @@ export default function PaymentResult() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Log query parameters for debugging
-    console.log("Query params:", { purchase_id, item_type, order_id });
-
     // Load products dynamically
     const loadProducts = async () => {
       try {
@@ -45,6 +42,15 @@ export default function PaymentResult() {
   }, []);
 
   useEffect(() => {
+    // Wait for router to be ready
+    if (!router.isReady) {
+      console.log("Router not ready, waiting...");
+      return;
+    }
+
+    // Log query parameters for debugging
+    console.log("Query params:", { purchase_id, item_type, order_id });
+
     if (!purchase_id || !item_type || !order_id) {
       console.warn("Missing query parameters:", { purchase_id, item_type, order_id });
       setStatus("failed");
@@ -69,6 +75,8 @@ export default function PaymentResult() {
           const foundProduct = products.find((p) => p.id === data.productId);
           setProduct(foundProduct || null);
           setTelegramLink(data.telegramLink || null);
+          // Clear any previous error toasts
+          toast.dismiss();
         } else {
           setStatus("failed");
           toast.error(data.error || "Payment verification failed");
@@ -83,7 +91,7 @@ export default function PaymentResult() {
     if (products.length > 0) {
       checkPaymentStatus();
     }
-  }, [purchase_id, item_type, order_id, products]);
+  }, [router.isReady, purchase_id, item_type, order_id, products]);
 
   return (
     <div className="min-h-screen bg-gray-50">
