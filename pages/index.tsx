@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
+import { GetStaticProps } from "next";
 
 // Define interfaces for Product
 interface Product {
@@ -15,34 +15,14 @@ interface Product {
   telegramLink?: string;
 }
 
-// Sample product data (replace with real data source in production)
-const products: Product[] = [
-  {
-    id: "1",
-    name: "eBook: Learn Programming",
-    description: "Comprehensive guide to modern programming techniques.",
-    price: 29.99,
-    image: "/ebook.jpg",
-    type: "ebook",
-    url: "https://example.com/ebook-download.pdf",
-    telegramLink: "https://t.me/learnprogramming",
-  },
-  {
-    id: "2",
-    name: "Physical Book",
-    description: "Hardcover programming book.",
-    price: 49.99,
-    image: "/book.jpg",
-    type: "physical",
-    telegramLink: "https://t.me/booksupport",
-  },
-];
-
 // Initialize font
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
-  const router = useRouter();
+interface HomeProps {
+  products: Product[];
+}
+
+export default function Home({ products }: HomeProps) {
   return (
     <div className={`min-h-screen bg-gray-100 ${inter.className}`}>
       <header className="bg-blue-600 text-white p-4">
@@ -74,3 +54,12 @@ export default function Home() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps = async () => {
+  const products: Product[] = (await import("../data/products.json")).default;
+  return {
+    props: {
+      products,
+    },
+  };
+};
