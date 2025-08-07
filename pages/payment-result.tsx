@@ -17,9 +17,18 @@ interface Product {
   preview: string[];
 }
 
+// Payment interface based on Cashfree API response
+interface Payment {
+  payment_status: "SUCCESS" | "FAILED" | "USER_DROPPED" | "NOT_ATTEMPTED";
+  cf_payment_id: number;
+  order_id: string;
+  product_id?: string; // Added to store productId if included in order
+  telegram_link?: string; // Added to store telegramLink if included in order
+}
+
 export default function PaymentResult() {
   const router = useRouter();
-  const { purchase_id, item_type } = router.query;
+  const { purchase_id, item_type, order_id } = router.query;
   const [status, setStatus] = useState<"loading" | "success" | "failed">("loading");
   const [product, setProduct] = useState<Product | null>(null);
   const [telegramLink, setTelegramLink] = useState<string | null>(null);
@@ -42,35 +51,53 @@ export default function PaymentResult() {
   }, []);
 
   useEffect(() => {
-    if (!purchase_id || item_type !== "product") {
+    if (!purchase_id || item_type !== "product" || !order_id) {
       setStatus("failed");
-      toast.error("Invalid purchase details");
+      toast.error("Invalid purchase details or missing order ID");
       return;
     }
 
     const checkPaymentStatus = async () => {
       try {
-        const response = await fetch(`/api/check-payment?purchaseId=${purchase_id}`);
-        const data = await response.json();
-        if (data.success && data.status === "PAID") {
+        const response = await fetch(`https://api.cashfree.com/pg/orders/${order_id}`, {
+          method: "GET",
+          headers: {
+            "x-client-id": process.env.NEXT_PUBLIC_CASHFREE_APP_ID || "",
+            "x-client-secret": process.env.CASHFREE_SECRET_KEY || "",
+            "x-api-version": "2023-08-01",
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.statusText}`);
+        }
+
+        const data: Payment[] = await response.json();
+        // Find the latest successful payment
+        const successfulPayment = data.find((payment) => payment.payment_status === "SUCCESS");
+
+        if (successfulPayment) {
           setStatus("success");
-          const foundProduct = products.find((p) => p.id === data.productId);
+          // Assume product_id and telegram_link are stored in payment or order data
+          // If not, you may need to map purchase_id to productId/telegramLink in a database
+          const foundProduct = products.find((p) => p.id === (successfulPayment.product_id || ""));
           setProduct(foundProduct || null);
-          setTelegramLink(data.telegramLink || null);
+          setTelegramLink(successfulPayment.telegram_link || null);
         } else {
           setStatus("failed");
-          toast.error(data.error || "Payment verification failed");
+          toast.error("No successful payment found for this order");
         }
       } catch (err: any) {
         setStatus("failed");
-        toast.error("Failed to verify payment");
+        toast.error(`Failed to verify payment: ${err.message}`);
       }
     };
 
     if (products.length > 0) {
       checkPaymentStatus();
     }
-  }, [purchase_id, item_type, products]);
+  }, [purchase_id, item_type, order_id, products]);
 
   return (
     <div className="min-h-screen bg-gray-50">
