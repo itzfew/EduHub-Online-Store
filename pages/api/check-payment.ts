@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
+// Mock database (replace with real database in production)
+const orders: { [key: string]: { id: string; customerName: string; email: string; address: string; productId: string; status: string } } = {};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -10,6 +13,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!orderId) {
     return res.status(400).json({ error: "Missing orderId" });
+  }
+
+  const order = orders[orderId as string];
+  if (!order) {
+    return res.status(404).json({ error: "Order not found" });
   }
 
   try {
@@ -22,12 +30,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const paymentStatus = response.data.order_status;
-    // In production, fetch order from database to get productId
-    const productId = "1"; // Placeholder for demo
+    orders[orderId as string].status = paymentStatus;
 
-    res.status(200).json({ status: paymentStatus, productId });
-  } catch (err) {
+    res.status(200).json({ status: paymentStatus, productId: order.productId });
+  } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: "Failed to check payment status" });
+    res.status(500).json({ error: "Failed to check payment status", details: err.response?.data || err.message });
   }
 }
