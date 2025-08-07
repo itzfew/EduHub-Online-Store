@@ -41,26 +41,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    const payments: { payment_status: string; order_note?: string }[] = response.data;
+    // Log response for debugging
+    console.log("Cashfree API response:", response.data);
+
+    const order = response.data;
+    const payments: { payment_status: string }[] = order.payments || [];
     const successfulPayment = payments.find((p) => p.payment_status === "SUCCESS");
 
-    if (successfulPayment) {
-      let productId: string | undefined, telegramLink: string | undefined;
-      try {
-        const note = successfulPayment.order_note ? JSON.parse(successfulPayment.order_note) : {};
-        productId = note.productId;
-        telegramLink = note.telegramLink;
-      } catch (error) {
-        console.error("Failed to parse order_note:", error);
-      }
+    let productId: string | undefined, telegramLink: string | undefined;
+    try {
+      const note = order.order_note ? JSON.parse(order.order_note) : {};
+      productId = note.productId;
+      telegramLink = note.telegramLink;
+    } catch (error) {
+      console.error("Failed to parse order_note:", error);
+    }
 
-      // Fallback to mock database if order_note is missing details
-      const order = Object.values(orders).find((o) => o.orderId === order_id);
-      if (!productId && order) {
-        productId = order.productId;
-        telegramLink = order.telegramLink;
-      }
+    // Fallback to mock database if order_note is missing details or no successful payment
+    const dbOrder = Object.values(orders).find((o) => o.orderId === order_id);
+    if (!productId && dbOrder) {
+      productId = dbOrder.productId;
+      telegramLink = dbOrder.telegramLink;
+    }
 
+    if (successfulPayment || (dbOrder && dbOrder.paymentStatus === "paid")) {
       return res.status(200).json({
         success: true,
         status: "PAID",
@@ -76,13 +80,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error: any) {
     console.error("Cashfree API error:", error?.response?.data || error.message);
     // Fallback to mock database
-    const order = Object.values(orders).find((o) => o.orderId === order_id);
-    if (order && order.paymentStatus === "paid") {
+    const dbOrder = Object.values(orders).find((o) => o.orderId === order_id);
+    if (dbOrder && dbOrder.paymentStatus === "paid") {
       return res.status(200).json({
         success: true,
         status: "PAID",
-        productId: order.productId,
-        telegramLink: order.telegramLink,
+        productId: dbOrder.productId,
+        telegramLink: dbOrder.telegramLink,
       });
     }
     return res.status(500).json({
