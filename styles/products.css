@@ -1,0 +1,28 @@
+.purchase-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.purchase-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.purchase-btn:active {
+  transform: translateY(0);
+}
+
+.rating-star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.rating-star:hover {
+  color: #facc15;
+}
