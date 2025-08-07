@@ -26,6 +26,9 @@ export default function PaymentResult() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
+    // Log query parameters for debugging
+    console.log("Query params:", { purchase_id, item_type, order_id });
+
     // Load products dynamically
     const loadProducts = async () => {
       try {
@@ -42,9 +45,17 @@ export default function PaymentResult() {
   }, []);
 
   useEffect(() => {
-    if (!purchase_id || item_type !== "product" || !order_id) {
+    if (!purchase_id || !item_type || !order_id) {
+      console.warn("Missing query parameters:", { purchase_id, item_type, order_id });
       setStatus("failed");
-      toast.error("Invalid purchase details or missing order ID");
+      toast.error("Missing or invalid purchase details");
+      return;
+    }
+
+    if (item_type !== "product") {
+      console.warn("Invalid item_type:", item_type);
+      setStatus("failed");
+      toast.error("Invalid item type");
       return;
     }
 
@@ -52,6 +63,7 @@ export default function PaymentResult() {
       try {
         const response = await fetch(`/api/verify-payment?order_id=${order_id}`);
         const data = await response.json();
+        console.log("Verify payment response:", data);
         if (data.success && data.status === "PAID") {
           setStatus("success");
           const foundProduct = products.find((p) => p.id === data.productId);
@@ -62,6 +74,7 @@ export default function PaymentResult() {
           toast.error(data.error || "Payment verification failed");
         }
       } catch (err: any) {
+        console.error("Payment verification error:", err);
         setStatus("failed");
         toast.error(`Failed to verify payment: ${err.message}`);
       }
