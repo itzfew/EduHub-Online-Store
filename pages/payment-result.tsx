@@ -17,15 +17,6 @@ interface Product {
   preview: string[];
 }
 
-// Payment interface based on Cashfree API response
-interface Payment {
-  payment_status: "SUCCESS" | "FAILED" | "USER_DROPPED" | "NOT_ATTEMPTED";
-  cf_payment_id: number;
-  order_id: string;
-  product_id?: string; // Added to store productId if included in order
-  telegram_link?: string; // Added to store telegramLink if included in order
-}
-
 export default function PaymentResult() {
   const router = useRouter();
   const { purchase_id, item_type, order_id } = router.query;
@@ -59,34 +50,16 @@ export default function PaymentResult() {
 
     const checkPaymentStatus = async () => {
       try {
-        const response = await fetch(`https://api.cashfree.com/pg/orders/${order_id}`, {
-          method: "GET",
-          headers: {
-            "x-client-id": process.env.NEXT_PUBLIC_CASHFREE_APP_ID || "",
-            "x-client-secret": process.env.CASHFREE_SECRET_KEY || "",
-            "x-api-version": "2023-08-01",
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.statusText}`);
-        }
-
-        const data: Payment[] = await response.json();
-        // Find the latest successful payment
-        const successfulPayment = data.find((payment) => payment.payment_status === "SUCCESS");
-
-        if (successfulPayment) {
+        const response = await fetch(`/api/verify-payment?order_id=${order_id}`);
+        const data = await response.json();
+        if (data.success && data.status === "PAID") {
           setStatus("success");
-          // Assume product_id and telegram_link are stored in payment or order data
-          // If not, you may need to map purchase_id to productId/telegramLink in a database
-          const foundProduct = products.find((p) => p.id === (successfulPayment.product_id || ""));
+          const foundProduct = products.find((p) => p.id === data.productId);
           setProduct(foundProduct || null);
-          setTelegramLink(successfulPayment.telegram_link || null);
+          setTelegramLink(data.telegramLink || null);
         } else {
           setStatus("failed");
-          toast.error("No successful payment found for this order");
+          toast.error(data.error || "Payment verification failed");
         }
       } catch (err: any) {
         setStatus("failed");
