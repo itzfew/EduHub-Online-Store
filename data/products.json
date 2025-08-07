@@ -2,20 +2,22 @@
   {
     "id": "1",
     "name": "eBook: Learn Programming",
-    "description": "Comprehensive guide to modern programming techniques.",
+    "description": "Comprehensive guide to modern programming techniques for beginners and experts.",
     "price": 29.99,
     "image": "/ebook.jpg",
     "type": "ebook",
     "url": "https://example.com/ebook-download.pdf",
-    "telegramLink": "https://t.me/learnprogramming"
+    "telegramLink": "https://t.me/learnprogramming",
+    "preview": ["/preview1.jpg", "/preview2.jpg"]
   },
   {
     "id": "2",
     "name": "Physical Book",
-    "description": "Hardcover programming book.",
+    "description": "Hardcover programming book covering advanced software development topics.",
     "price": 49.99,
     "image": "/book.jpg",
     "type": "physical",
-    "telegramLink": "https://t.me/booksupport"
+    "telegramLink": "https://t.me/booksupport",
+    "preview": ["/preview1.jpg", "/preview2.jpg"]
   }
 ]
