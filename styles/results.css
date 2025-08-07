@@ -1,18 +1,93 @@
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem; /* Matches Tailwind's gap-4 */
+  flex-wrap: nowrap; /* Ensures buttons stay in one row */
+  width: 100%;
+  max-width: 400px; /* Limits width on larger screens */
+  margin: 0 auto;
+}
+
+/* Home button styles */
 .home-btn {
-  display: inline-block;
-  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem; /* Matches Tailwind's p-4 */
   background: linear-gradient(90deg, #3b82f6, #60a5fa);
   color: white;
   border-radius: 6px;
   font-weight: 600;
-  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1; /* Equal width for buttons */
+  text-align: center;
 }
 
 .home-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.home-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
 
 .home-btn:active {
   transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Receipt button styles */
+.receipt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1; /* Equal width for buttons */
+  text-align: center;
+}
+
+.receipt-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+.receipt-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5);
+}
+
+.receipt-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .button-container {
+    gap: 0.5rem; /* Smaller gap on small screens */
+  }
+
+  .home-btn,
+  .receipt-btn {
+    padding: 0.5rem 1rem; /* Smaller padding on small screens */
+    font-size: 0.875rem; /* Smaller font size */
+  }
 }
