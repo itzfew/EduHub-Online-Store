@@ -5,7 +5,6 @@ import { GetStaticProps } from "next";
 import { useState } from "react";
 import Slider from "react-slick";
 
-// Define interfaces for Product
 interface Product {
   id: string;
   name: string;
@@ -18,7 +17,6 @@ interface Product {
   preview: string[];
 }
 
-// Initialize font
 const inter = Inter({ subsets: ["latin"] });
 
 interface HomeProps {
@@ -26,27 +24,18 @@ interface HomeProps {
 }
 
 export default function Home({ products }: HomeProps) {
-  // State for hamburger menu
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Toggle hamburger menu
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  // Truncate description to first 10 words
   const truncateDescription = (desc: string) => {
     const words = desc.split(" ");
     return words.length > 10 ? words.slice(0, 10).join(" ") + "..." : desc;
   };
 
-  // Generate random rating (4.0 to 4.9)
   const getRandomRating = () => (4 + Math.random() * 0.9).toFixed(1);
 
-  // Select random products for trending slider and popular section
   const shuffledProducts = products.sort(() => Math.random() - 0.5);
   const trendingProducts = shuffledProducts.slice(0, Math.min(5, products.length));
-  const popularProducts = shuffledProducts.slice(0, 4); // 4 for Popular section
+  const popularProducts = shuffledProducts.slice(0, 4);
+  const featuredProducts = shuffledProducts.slice(0, 8);
 
-  // Slider settings
   const sliderSettings = {
     dots: false,
     infinite: true,
@@ -60,51 +49,37 @@ export default function Home({ products }: HomeProps) {
 
   return (
     <div className={`min-h-screen bg-gray-50 ${inter.className}`}>
-      {/* Navigation Bar */}
+      {/* Navigation Bar - Simplified without hamburger */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">EduHub Online Store</h1>
-          <nav className="hidden md:flex space-x-6">
-            <Link href="/contact" className="nav-link">
+          <nav className="flex space-x-6">
+            <Link href="/contact" className="hover:text-blue-200 transition-colors font-medium">
               Contact
             </Link>
-            <Link href="/terms" className="nav-link">
-              Terms and Conditions
+            <Link href="/terms" className="hover:text-blue-200 transition-colors font-medium">
+              Terms
             </Link>
-            <Link href="/refund" className="nav-link">
+            <Link href="/refund" className="hover:text-blue-200 transition-colors font-medium">
               Refund Policy
             </Link>
           </nav>
-          <button className="md:hidden hamburger-btn" onClick={toggleMenu}>
-            {isMenuOpen ? "✕" : "☰"}
-          </button>
         </div>
-        {isMenuOpen && (
-          <nav className="md:hidden bg-blue-700 p-4 flex flex-col space-y-4">
-            <Link href="/contact" className="nav-link" onClick={toggleMenu}>
-              Contact
-            </Link>
-            <Link href="/terms" className="nav-link" onClick={toggleMenu}>
-              Terms and Conditions
-            </Link>
-            <Link href="/refund" className="nav-link" onClick={toggleMenu}>
-              Refund Policy
-            </Link>
-          </nav>
-        )}
       </header>
 
       {/* Trending Products Slider */}
-      <section className="bg-gray-800 text-white py-3">
-        <div className="container mx-auto">
-          <h2 className="text-lg font-semibold text-center mb-2">Trending Products</h2>
+      <section className="bg-gray-800 text-white py-4 border-b-2 border-blue-500">
+        <div className="container mx-auto px-4">
+          <h2 className="text-xl font-bold text-center mb-4">🔥 Trending Now</h2>
           <Slider {...sliderSettings}>
             {trendingProducts.map((product) => (
               <div key={product.id} className="px-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-base truncate">{product.name}</span>
+                <div className="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
+                  <span className="text-sm sm:text-base font-medium truncate">{product.name}</span>
                   <Link href={`/product/${product.id}`}>
-                    <button className="view-trending-btn">View</button>
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-md transition-colors font-medium">
+                      View Offer
+                    </button>
                   </Link>
                 </div>
               </div>
@@ -113,54 +88,146 @@ export default function Home({ products }: HomeProps) {
         </div>
       </section>
 
-      {/* Fresh Recommendations Section */}
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <h2 className="text-xl font-semibold mb-6 text-center text-gray-800">Fresh Recommendations</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <Link href={`/product/${product.id}`} key={product.id} className="block">
-              <div className="product-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={300}
-                  height={200}
-                  className="w-full h-48 object-cover mb-4 rounded-md"
-                />
-                <h3 className="text-lg font-semibold text-gray-800 truncate text-center">{product.name}</h3>
-                <div className="hidden sm:block">
-                  <p className="text-gray-600 text-sm mb-2 text-center">{truncateDescription(product.description)}</p>
-                  <p className="text-lg font-bold text-blue-600 text-center">₹{product.price.toFixed(2)}</p>
-                  <div className="flex items-center justify-center mb-4">
-                    <span className="text-yellow-400">★★★★☆</span>
-                    <span className="ml-2 text-gray-600 text-sm">({getRandomRating()})</span>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {/* Featured Products Section */}
+        <section className="mb-12">
+          <div className="flex items-center mb-6">
+            <div className="flex-grow border-t-2 border-blue-500"></div>
+            <h2 className="text-2xl font-bold text-gray-800 mx-4">Featured Products</h2>
+            <div className="flex-grow border-t-2 border-blue-500"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {featuredProducts.map((product) => (
+              <div key={product.id} className="group">
+                <Link href={`/product/${product.id}`}>
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        width={300}
+                        height={200}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-4 flex-grow flex flex-col">
+                      <h3 className="text-lg font-bold text-gray-800 mb-2">{product.name}</h3>
+                      <p className="text-gray-600 text-sm mb-4 flex-grow">
+                        {truncateDescription(product.description)}
+                      </p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className="text-lg font-bold text-blue-600">₹{product.price.toFixed(2)}</span>
+                        <div className="flex items-center">
+                          <span className="text-yellow-400 mr-1">★★★★☆</span>
+                          <span className="text-gray-500 text-sm">({getRandomRating()})</span>
+                        </div>
+                      </div>
+                      <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-medium transition-colors">
+                        View Details
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <button className="view-details-btn w-full">View Details</button>
+                </Link>
               </div>
-            </Link>
-          ))}
-        </div>
+            ))}
+          </div>
+        </section>
 
         {/* Popular Products Section */}
-        <h2 className="text-xl font-semibold mt-10 mb-6 text-center text-gray-800">Popular Products</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {popularProducts.map((product) => (
-            <Link href={`/product/${product.id}`} key={product.id} className="block">
-              <div className="popular-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={300}
-                  height={200}
-                  className="w-full h-48 object-cover mb-4 rounded-md"
-                />
-                <button className="view-details-btn w-full">View</button>
+        <section className="mb-12">
+          <div className="flex items-center mb-6">
+            <div className="flex-grow border-t-2 border-blue-500"></div>
+            <h2 className="text-2xl font-bold text-gray-800 mx-4">Popular Choices</h2>
+            <div className="flex-grow border-t-2 border-blue-500"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {popularProducts.map((product) => (
+              <div key={product.id} className="group">
+                <Link href={`/product/${product.id}`}>
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col md:flex-row h-full">
+                    <div className="md:w-1/3 h-48 md:h-auto">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        width={300}
+                        height={200}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-6 md:w-2/3 flex flex-col">
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">{product.name}</h3>
+                      <p className="text-gray-600 mb-4 flex-grow">{product.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xl font-bold text-blue-600">₹{product.price.toFixed(2)}</span>
+                        <div className="flex items-center">
+                          <span className="text-yellow-400 mr-1">★★★★☆</span>
+                          <span className="text-gray-500 text-sm">({getRandomRating()})</span>
+                        </div>
+                      </div>
+                      <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md font-medium transition-colors self-start">
+                        Buy Now
+                      </button>
+                    </div>
+                  </div>
+                </Link>
               </div>
-            </Link>
-          ))}
-        </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Categories Section */}
+        <section>
+          <div className="flex items-center mb-6">
+            <div className="flex-grow border-t-2 border-blue-500"></div>
+            <h2 className="text-2xl font-bold text-gray-800 mx-4">Shop By Category</h2>
+            <div className="flex-grow border-t-2 border-blue-500"></div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {['E-books', 'Courses', 'Templates', 'Tools', 'Guides', 'Kits'].map((category) => (
+              <Link key={category} href={`/category/${category.toLowerCase()}`}>
+                <div className="bg-white rounded-lg shadow-md p-6 text-center hover:bg-blue-50 transition-colors cursor-pointer border border-gray-200">
+                  <div className="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-3">
+                    <span className="text-blue-600 text-2xl">📚</span>
+                  </div>
+                  <h3 className="font-semibold text-gray-800">{category}</h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-8 border-t-2 border-blue-500">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4">EduHub Store</h3>
+              <p className="text-gray-300">Quality educational resources for students and professionals.</p>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li><Link href="/" className="text-gray-300 hover:text-white transition-colors">Home</Link></li>
+                <li><Link href="/products" className="text-gray-300 hover:text-white transition-colors">All Products</Link></li>
+                <li><Link href="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-4">Support</h3>
+              <ul className="space-y-2">
+                <li><Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link href="/faq" className="text-gray-300 hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+            <p>© {new Date().getFullYear()} EduHub Online Store. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
