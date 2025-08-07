@@ -7,5 +7,5 @@ interface Cashfree {
 }
 
 interface Window {
-  Cashfree: new (config: { mode: string }) => Cashfree;
+  Cashfree: (config: { mode: string }) => Cashfree;
 }
