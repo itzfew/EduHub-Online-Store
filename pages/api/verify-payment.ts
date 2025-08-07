@@ -42,29 +42,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Log response for debugging
-    console.log("Cashfree API response:", response.data);
+    console.log("Cashfree API response:", JSON.stringify(response.data, null, 2));
 
     const order = response.data;
-    const payments: { payment_status: string }[] = order.payments || [];
-    const successfulPayment = payments.find((p) => p.payment_status === "SUCCESS");
 
+    // Decode and parse order_note
     let productId: string | undefined, telegramLink: string | undefined;
     try {
-      const note = order.order_note ? JSON.parse(order.order_note) : {};
-      productId = note.productId;
-      telegramLink = note.telegramLink;
+      if (order.order_note) {
+        // Replace HTML-encoded quotes and other entities
+        const decodedNote = order.order_note
+          .replace(/&quot;/g, '"')
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>');
+        const note = JSON.parse(decodedNote);
+        productId = note.productId;
+        telegramLink = note.telegramLink;
+      }
     } catch (error) {
       console.error("Failed to parse order_note:", error);
     }
 
-    // Fallback to mock database if order_note is missing details or no successful payment
+    // Fallback to mock database if order_note is missing details
     const dbOrder = Object.values(orders).find((o) => o.orderId === order_id);
     if (!productId && dbOrder) {
       productId = dbOrder.productId;
       telegramLink = dbOrder.telegramLink;
     }
 
-    if (successfulPayment || (dbOrder && dbOrder.paymentStatus === "paid")) {
+    // Check if order_status is PAID
+    if (order.order_status === "PAID" || (dbOrder && dbOrder.paymentStatus === "paid")) {
       return res.status(200).json({
         success: true,
         status: "PAID",
@@ -75,6 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({
         success: false,
         error: "No successful payment found",
+        orderStatus: order.order_status,
       });
     }
   } catch (error: any) {
