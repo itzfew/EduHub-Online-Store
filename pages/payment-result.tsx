@@ -14,6 +14,7 @@ interface Product {
   type: string;
   url?: string;
   telegramLink?: string;
+  preview: string[];
 }
 
 export default function PaymentResult() {
@@ -71,65 +72,56 @@ export default function PaymentResult() {
     }
   }, [purchase_id, item_type, products]);
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        <header className="bg-blue-600 text-white p-4">
-          <h1 className="text-2xl font-bold">Payment Result</h1>
-        </header>
-        <main className="container mx-auto p-4">
-          <p>Loading payment status...</p>
-        </main>
-        <ToastContainer />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <header className="bg-blue-600 text-white p-4">
-        <h1 className="text-2xl font-bold">Payment Result</h1>
+        <h1 className="text-2xl font-bold text-center">Payment Result</h1>
       </header>
-      <main className="container mx-auto p-4">
-        {status === "success" ? (
-          <div className="bg-white p-6 rounded shadow max-w-md mx-auto">
-            <h2 className="text-xl font-semibold text-green-600">Payment Successful!</h2>
-            <p className="mt-2">Thank you for your purchase.</p>
-            {product?.type === "ebook" && product?.url && (
-              <div className="mt-4">
-                <p>Access your eBook here:</p>
-                <a
-                  href={product.url}
-                  className="text-blue-500 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download eBook
-                </a>
-              </div>
-            )}
-            {telegramLink && (
-              <div className="mt-4">
-                <p>Join our Telegram community:</p>
-                <a
-                  href={telegramLink}
-                  className="text-blue-500 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Join Telegram
-                </a>
-              </div>
-            )}
-            <Link href="/" className="mt-4 block text-blue-500 hover:underline">
-              Back to Home
-            </Link>
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+        {status === "loading" ? (
+          <div className="text-center p-6">
+            <p className="text-lg text-gray-600">Loading payment status...</p>
           </div>
         ) : (
-          <div className="bg-white p-6 rounded shadow max-w-md mx-auto">
-            <h2 className="text-xl font-semibold text-red-600">Payment Failed</h2>
-            <p className="mt-2">Please try again or contact support.</p>
-            <Link href="/" className="mt-4 block text-blue-500 hover:underline">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
+            {status === "success" ? (
+              <>
+                <h2 className="text-xl font-semibold text-green-600 mb-4">Payment Successful!</h2>
+                <p className="text-gray-600 mb-4">Thank you for your purchase.</p>
+                {product?.type === "ebook" && product?.url && (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700">Access your eBook here:</p>
+                    <a
+                      href={product.url}
+                      className="text-blue-500 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Download eBook
+                    </a>
+                  </div>
+                )}
+                {telegramLink && (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700">Join our Telegram community:</p>
+                    <a
+                      href={telegramLink}
+                      className="text-blue-500 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Join Telegram
+                    </a>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold text-red-600 mb-4">Payment Failed</h2>
+                <p className="text-gray-600 mb-4">Please try again or contact support.</p>
+              </>
+            )}
+            <Link href="/" className="home-btn">
               Back to Home
             </Link>
           </div>
