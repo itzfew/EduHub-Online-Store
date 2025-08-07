@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import "../styles/results.css"; // Import updated CSS
 
 // Product interface
 interface Product {
@@ -17,6 +18,17 @@ interface Product {
   preview: string[];
 }
 
+// Order interface for receipt
+interface OrderDetails {
+  order_id: string;
+  productId: string;
+  amount: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  createdAt: string;
+}
+
 export default function PaymentResult() {
   const router = useRouter();
   const { purchase_id, item_type, order_id } = router.query;
@@ -24,6 +36,7 @@ export default function PaymentResult() {
   const [product, setProduct] = useState<Product | null>(null);
   const [telegramLink, setTelegramLink] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
 
   useEffect(() => {
     // Load products dynamically
@@ -75,6 +88,16 @@ export default function PaymentResult() {
           const foundProduct = products.find((p) => p.id === data.productId);
           setProduct(foundProduct || null);
           setTelegramLink(data.telegramLink || null);
+          // Store order details for receipt
+          setOrderDetails({
+            order_id: order_id as string,
+            productId: data.productId,
+            amount: 1, // Replace with actual amount from API if available
+            customerName: "Waheed", // Replace with actual customer data
+            customerEmail: "tsajktv@gmail.com",
+            customerPhone: "7780858886",
+            createdAt: new Date().toISOString(),
+          });
           // Clear any previous error toasts
           toast.dismiss();
         } else {
@@ -92,6 +115,63 @@ export default function PaymentResult() {
       checkPaymentStatus();
     }
   }, [router.isReady, purchase_id, item_type, order_id, products]);
+
+  // Generate and download receipt as LaTeX PDF
+  const handleDownloadReceipt = async () => {
+    if (!orderDetails) {
+      toast.error("Order details not available");
+      return;
+    }
+
+    try {
+      // Generate LaTeX content for receipt
+      const latexContent = `
+\\documentclass{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage{geometry}
+\\geometry{a4paper, margin=1in}
+\\usepackage{fontspec}
+\\setmainfont{DejaVu Sans}
+\\usepackage{fancyhdr}
+\\pagestyle{fancy}
+\\fancyhf{}
+\\fancyhead[C]{Payment Receipt}
+\\fancyfoot[C]{\\thepage}
+\\begin{document}
+\\begin{center}
+  \\textbf{\\Large Payment Receipt}\\\\
+  \\vspace{0.5cm}
+  EduHub Online Store
+\\end{center}
+\\vspace{0.5cm}
+\\noindent
+\\textbf{Order ID:} ${orderDetails.order_id}\\\\
+\\textbf{Product ID:} ${orderDetails.productId}\\\\
+\\textbf{Amount:} INR ${orderDetails.amount.toFixed(2)}\\\\
+\\textbf{Customer Name:} ${orderDetails.customerName}\\\\
+\\textbf{Email:} ${orderDetails.customerEmail}\\\\
+\\textbf{Phone:} ${orderDetails.customerPhone}\\\\
+\\textbf{Date:} ${new Date(orderDetails.createdAt).toLocaleDateString()}\\\\
+\\vspace{0.5cm}
+\\noindent
+Thank you for your purchase! For support, contact support@eduhub.com.
+\\end{document}
+`;
+
+      // Create a Blob for the LaTeX content
+      const blob = new Blob([latexContent], { type: "text/latex" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `receipt_${orderDetails.order_id}.tex`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success("Receipt downloaded successfully");
+    } catch (error) {
+      console.error("Failed to generate receipt:", error);
+      toast.error("Failed to download receipt");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -135,19 +215,29 @@ export default function PaymentResult() {
                     </a>
                   </div>
                 )}
+                <div className="button-container flex justify-center gap-4 mt-6">
+                  <Link href="/" className="home-btn">
+                    Back to Home
+                  </Link>
+                  <button onClick={handleDownloadReceipt} className="receipt-btn">
+                    Download Receipt
+                  </button>
+                </div>
               </>
             ) : (
               <>
                 <h2 className="text-xl font-semibold text-red-600 mb-4">Payment Failed</h2>
                 <p className="text-gray-600 mb-4">Please try again or contact support.</p>
+                <div className="button-container flex justify-center gap-4 mt-6">
+                  <Link href="/" className="home-btn">
+                    Back to Home
+                  </Link>
+                </div>
               </>
             )}
-            <Link href="/" className="home-btn">
-              Back to Home
-            </Link>
           </div>
         )}
-        <ToastContainer />
+        <ToastContainer autoClose={5000} limit={1} />
       </main>
     </div>
   );
