@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-// Product interface (same as in index.tsx)
+// Product interface
 interface Product {
   id: string;
   name: string;
@@ -12,9 +12,10 @@ interface Product {
   image: string;
   type: string;
   url?: string;
+  telegramLink?: string;
 }
 
-// Sample product data (same as in index.tsx)
+// Sample product data
 const products: Product[] = [
   {
     id: "1",
@@ -24,6 +25,7 @@ const products: Product[] = [
     image: "/ebook.jpg",
     type: "ebook",
     url: "https://example.com/ebook-download.pdf",
+    telegramLink: "https://t.me/learnprogramming",
   },
   {
     id: "2",
@@ -32,6 +34,7 @@ const products: Product[] = [
     price: 49.99,
     image: "/book.jpg",
     type: "physical",
+    telegramLink: "https://t.me/booksupport",
   },
 ];
 
@@ -54,7 +57,7 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-blue-600 text-white p-4">
-        <h1 className="text-2xl font-bold">E-Commerce Store</h1>
+        <h1 className="text-2xl font-bold">Dealsbe - Software Deals</h1>
       </header>
       <main className="container mx-auto p-4">
         <Link href="/" className="text-blue-500 hover:underline">
@@ -70,8 +73,12 @@ export default function ProductDetail() {
           />
           <h2 className="text-2xl font-semibold">{product.name}</h2>
           <p className="text-gray-600 mb-4">{product.description}</p>
-          <p className="text-lg font-bold mb-4">${product.price.toFixed(2)}</p>
-          <Link href={`/checkout?productId=${product.id}`}>
+          <p className="text-lg font-bold mb-4">₹{product.price.toFixed(2)}</p>
+          <Link
+            href={`/checkout?productId=${product.id}&productName=${encodeURIComponent(
+              product.name
+            )}&amount=${product.price}&telegramLink=${encodeURIComponent(product.telegramLink || "")}`}
+          >
             <button className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
               Purchase
             </button>
