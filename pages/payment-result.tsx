@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+
+
 // Product interface
 interface Product {
   id: string;
@@ -122,7 +124,7 @@ export default function PaymentResult() {
     }
 
     try {
-      // Generate LaTeX content for receipt
+      // Generate LaTeX content for receipt with table and digital signature
       const latexContent = `
 \\documentclass{article}
 \\usepackage[utf8]{inputenc}
@@ -131,6 +133,8 @@ export default function PaymentResult() {
 \\usepackage{fontspec}
 \\setmainfont{DejaVu Sans}
 \\usepackage{fancyhdr}
+\\usepackage{booktabs}
+\\usepackage{array}
 \\pagestyle{fancy}
 \\fancyhf{}
 \\fancyhead[C]{Payment Receipt}
@@ -139,20 +143,31 @@ export default function PaymentResult() {
 \\begin{center}
   \\textbf{\\Large Payment Receipt}\\\\
   \\vspace{0.5cm}
-  EduHub Online Store
+  EduHub Online Store\\\\
+  \\vspace{0.2cm}
+  \\small itzme.eduhub.contact@gmail.com
 \\end{center}
 \\vspace{0.5cm}
 \\noindent
-\\textbf{Order ID:} ${orderDetails.order_id}\\\\
-\\textbf{Product ID:} ${orderDetails.productId}\\\\
-\\textbf{Amount:} INR ${orderDetails.amount.toFixed(2)}\\\\
-\\textbf{Customer Name:} ${orderDetails.customerName}\\\\
-\\textbf{Email:} ${orderDetails.customerEmail}\\\\
-\\textbf{Phone:} ${orderDetails.customerPhone}\\\\
-\\textbf{Date:} ${new Date(orderDetails.createdAt).toLocaleDateString()}\\\\
+\\begin{tabular}{@{}>{\\bfseries}l p{4in}@{}}
+  \\toprule
+  Order ID & ${orderDetails.order_id} \\\\
+  Product ID & ${orderDetails.productId} \\\\
+  Amount & INR ${orderDetails.amount.toFixed(2)} \\\\
+  Customer Name & ${orderDetails.customerName} \\\\
+  Email & ${orderDetails.customerEmail} \\\\
+  Phone & ${orderDetails.customerPhone} \\\\
+  Date & ${new Date(orderDetails.createdAt).toLocaleDateString()} \\\\
+  \\bottomrule
+\\end{tabular}
 \\vspace{0.5cm}
 \\noindent
-Thank you for your purchase! For support, contact support@eduhub.com.
+\\textbf{Digitally Signed}\\\\
+EduHub Online Store\\\\
+Date: ${new Date().toLocaleDateString()}
+\\vspace{0.5cm}
+\\noindent
+Thank you for your purchase! For support, contact itzme.eduhub.contact@gmail.com.
 \\end{document}
 `;
 
@@ -182,42 +197,40 @@ Thank you for your purchase! For support, contact support@eduhub.com.
             <p className="text-lg text-gray-600">Loading payment status...</p>
           </div>
         ) : (
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto text-center">
             {status === "success" ? (
               <>
                 <h2 className="text-xl font-semibold text-green-600 mb-4">Payment Successful!</h2>
                 <p className="text-gray-600 mb-4">Thank you for your purchase.</p>
-                {product?.type === "ebook" && product?.url && (
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700">Access your eBook here:</p>
-                    <a
-                      href={product.url}
-                      className="text-blue-500 hover:underline"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Download eBook
-                    </a>
+                {(product?.type === "ebook" && product?.url) || telegramLink ? (
+                  <div className="button-container flex justify-center gap-4 mb-4">
+                    {product?.type === "ebook" && product?.url && (
+                      <a
+                        href={product.url}
+                        className="action-btn ebook-btn"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Download eBook
+                      </a>
+                    )}
+                    {telegramLink && (
+                      <a
+                        href={telegramLink}
+                        className="action-btn telegram-btn"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Join Telegram
+                      </a>
+                    )}
                   </div>
-                )}
-                {telegramLink && (
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700">Join our Telegram community:</p>
-                    <a
-                      href={telegramLink}
-                      className="text-blue-500 hover:underline"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Join Telegram
-                    </a>
-                  </div>
-                )}
-                <div className="button-container flex justify-center gap-4 mt-6">
-                  <Link href="/" className="home-btn">
+                ) : null}
+                <div className="link-container flex justify-center gap-4 mt-4">
+                  <Link href="/" className="home-link">
                     Back to Home
                   </Link>
-                  <button onClick={handleDownloadReceipt} className="receipt-btn">
+                  <button onClick={handleDownloadReceipt} className="receipt-link">
                     Download Receipt
                   </button>
                 </div>
@@ -226,8 +239,8 @@ Thank you for your purchase! For support, contact support@eduhub.com.
               <>
                 <h2 className="text-xl font-semibold text-red-600 mb-4">Payment Failed</h2>
                 <p className="text-gray-600 mb-4">Please try again or contact support.</p>
-                <div className="button-container flex justify-center gap-4 mt-6">
-                  <Link href="/" className="home-btn">
+                <div className="link-container flex justify-center gap-4 mt-4">
+                  <Link href="/" className="home-link">
                     Back to Home
                   </Link>
                 </div>
