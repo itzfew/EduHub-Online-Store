@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { GetStaticProps, GetStaticPaths } from "next";
 
 // Product interface
 interface Product {
@@ -15,43 +16,15 @@ interface Product {
   telegramLink?: string;
 }
 
-// Sample product data
-const products: Product[] = [
-  {
-    id: "1",
-    name: "eBook: Learn Programming",
-    description: "Comprehensive guide to modern programming techniques.",
-    price: 29.99,
-    image: "/ebook.jpg",
-    type: "ebook",
-    url: "https://example.com/ebook-download.pdf",
-    telegramLink: "https://t.me/learnprogramming",
-  },
-  {
-    id: "2",
-    name: "Physical Book",
-    description: "Hardcover programming book.",
-    price: 49.99,
-    image: "/book.jpg",
-    type: "physical",
-    telegramLink: "https://t.me/booksupport",
-  },
-];
+interface ProductDetailProps {
+  product: Product | null;
+}
 
-export default function ProductDetail() {
+export default function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter();
-  const { id } = router.query;
-  const [product, setProduct] = useState<Product | null>(null);
-
-  useEffect(() => {
-    if (id) {
-      const foundProduct = products.find((p) => p.id === id);
-      setProduct(foundProduct || null);
-    }
-  }, [id]);
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <div>Product not found</div>;
   }
 
   return (
@@ -88,3 +61,26 @@ export default function ProductDetail() {
     </div>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const products: Product[] = (await import("../../data/products.json")).default;
+  const paths = products.map((product) => ({
+    params: { id: product.id },
+  }));
+
+  return {
+    paths,
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const products: Product[] = (await import("../../data/products.json")).default;
+  const product = products.find((p) => p.id === params?.id) || null;
+
+  return {
+    props: {
+      product,
+    },
+  };
+};
