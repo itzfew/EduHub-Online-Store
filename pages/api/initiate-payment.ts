@@ -1,79 +1,91 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 
-// Mock database (replace with Vercel Postgres in production)
-const orders: { [key: string]: { id: string; customerName: string; email: string; address: string; productId: string; status: string; createdAt: string } } = {};
+// Mock database (replace with real database in production)
+const orders: {
+  [key: string]: {
+    purchaseId: string;
+    productId: string;
+    productName: string;
+    amount: number;
+    telegramLink: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    telegramUsername: string;
+    customerAddress: string;
+    paymentStatus: string;
+    createdAt: string;
+  };
+} = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
-  let { orderId, productId, amount } = req.body;
+  const { purchaseId } = req.body;
 
-  if (!orderId || !productId || !amount) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!purchaseId) {
+    return res.status(400).json({ success: false, error: "Missing purchaseId" });
   }
 
-  // Fetch order from mock database
-  const order = orders[orderId];
+  const order = orders[purchaseId];
   if (!order) {
-    console.error(`Order not found for orderId: ${orderId}`);
-    return res.status(404).json({ error: "Order not found" });
+    return res.status(404).json({ success: false, error: "Order not found" });
   }
 
-  const maxRetries = 3;
-  let attempt = 0;
+  const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-  while (attempt < maxRetries) {
-    try {
-      const response = await axios.post(
-        "https://api.cashfree.com/pg/orders",
-        {
-          order_id: orderId,
-          order_amount: amount,
-          order_currency: "INR", // Adjust based on your needs
-          customer_details: {
-            customer_id: `cust_${Date.now()}`,
-            customer_email: order.email,
-            customer_phone: "9999999999", // Replace with actual customer phone
-          },
-          order_meta: {
-            return_url: `${process.env.NEXT_PUBLIC_URL}/payment-result?orderId={order_id}`,
-            notify_url: `${process.env.NEXT_PUBLIC_URL}/api/webhook`,
-          },
+  try {
+    const response = await axios.post(
+      "https://api.cashfree.com/pg/orders",
+      {
+        order_id: orderId,
+        order_amount: order.amount,
+        order_currency: "INR",
+        customer_details: {
+          customer_id: `cust_${order.productId}`,
+          customer_name: order.customerName,
+          customer_email: order.customerEmail,
+          customer_phone: order.customerPhone,
         },
-        {
-          headers: {
-            "x-api-version": "2022-09-01",
-            "x-client-id": process.env.CASHFREE_APP_ID,
-            "x-client-secret": process.env.CASHFREE_SECRET_KEY,
-          },
-        }
-      );
-
-      // Update order status
-      orders[orderId].status = "INITIATED";
-      console.log(`Payment initiated for orderId: ${orderId}`);
-      return res.status(200).json({ paymentLink: response.data.payment_link });
-    } catch (err: any) {
-      if (err.response?.status === 409 && err.response?.data?.code === "order_already_exists") {
-        // Generate new order_id and retry
-        attempt++;
-        const newOrderId = uuidv4();
-        orders[newOrderId] = { ...order, id: newOrderId };
-        delete orders[orderId]; // Remove old order
-        orderId = newOrderId;
-        req.body.orderId = newOrderId;
-        console.log(`Retry attempt ${attempt} with new orderId: ${newOrderId}`);
-        continue;
+        order_meta: {
+          return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-result?purchase_id=${purchaseId}&item_type=product`,
+          notify_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhook`,
+        },
+        order_note: JSON.stringify({
+          telegramLink: order.telegramLink,
+          telegramUsername: order.telegramUsername,
+          customerAddress: order.customerAddress,
+          purchaseId,
+        }),
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-version": "2022-09-01",
+          "x-client-id": process.env.CASHFREE_APP_ID,
+          "x-client-secret": process.env.CASHFREE_SECRET_KEY,
+        },
       }
-      console.error(`Payment initiation failed for orderId: ${orderId}`, err.response?.data || err.message);
-      return res.status(500).json({ error: "Failed to initiate payment", details: err.response?.data || err.message });
-    }
-  }
+    );
 
-  console.error(`Max retries reached for orderId: ${orderId}`);
-  return res.status(500).json({ error: "Failed to initiate payment after maximum retries" });
+    const paymentSessionId = response.data.payment_session_id;
+    orders[purchaseId].paymentStatus = "INITIATED";
+
+    return res.status(200).json({
+      success: true,
+      paymentSessionId,
+      orderId,
+      purchaseId,
+    });
+  } catch (error: any) {
+    console.error("Cashfree order creation failed:", error?.response?.data || error.message);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to create Cashfree order",
+      details: error?.response?.data || error.message,
+    });
+  }
 }
