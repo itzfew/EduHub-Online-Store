@@ -1,0 +1,21 @@
+[
+  {
+    "id": "1",
+    "name": "eBook: Learn Programming",
+    "description": "Comprehensive guide to modern programming techniques.",
+    "price": 29.99,
+    "image": "/ebook.jpg",
+    "type": "ebook",
+    "url": "https://example.com/ebook-download.pdf",
+    "telegramLink": "https://t.me/learnprogramming"
+  },
+  {
+    "id": "2",
+    "name": "Physical Book",
+    "description": "Hardcover programming book.",
+    "price": 49.99,
+    "image": "/book.jpg",
+    "type": "physical",
+    "telegramLink": "https://t.me/booksupport"
+  }
+]
