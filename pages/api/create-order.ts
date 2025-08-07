@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
 
+// Mock database (replace with real database in production)
+const orders: { [key: string]: { id: string; customerName: string; email: string; address: string; productId: string; status: string } } = {};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -12,12 +15,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  // In production, save order to a database
   const orderId = uuidv4();
-  const order = { id: orderId, customerName, email, address, productId };
+  const order = { id: orderId, customerName, email, address, productId, status: "PENDING" };
 
-  // Simulate saving to database
-  // Replace with actual database logic (e.g., Prisma, MongoDB)
+  // Store order in mock database
+  orders[orderId] = order;
   console.log("Order created:", order);
 
   res.status(200).json({ orderId });
