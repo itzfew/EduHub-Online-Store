@@ -7,11 +7,11 @@ export default function Refund() {
   return (
     <div className={`min-h-screen bg-gray-100 ${inter.className}`}>
       <header className="bg-blue-600 text-white p-4">
-        <h1 className="text-2xl font-bold text-center">Dealsbe - Refund Policy</h1>
+        <h1 className="text-2xl font-bold text-center"> Refund Policy</h1>
       </header>
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">Refund Policy</h2>
+          
           <div className="text-gray-600 space-y-4">
             <section>
               <h3 className="text-lg font-semibold">1. Non-Refundable Digital Products</h3>
