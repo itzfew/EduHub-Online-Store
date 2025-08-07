@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -9,14 +10,6 @@ interface Product {
   image: string;
   type: string;
   url?: string;
-}
-
-interface Order {
-  id: string;
-  customerName: string;
-  email: string;
-  address: string;
-  productId: string;
 }
 
 const products: Product[] = [
@@ -47,6 +40,7 @@ export default function Payment() {
 
   useEffect(() => {
     if (!orderId) {
+      console.error("No orderId provided in payment page");
       setError("Invalid order");
       setLoading(false);
       return;
@@ -54,11 +48,9 @@ export default function Payment() {
 
     const initiatePayment = async () => {
       try {
-        // For demo, we'll assume order exists
-        const order: Order = { id: orderId as string, customerName: "", email: "", address: "", productId: products[0].id };
-        const product = products.find((p) => p.id === order.productId);
-
+        const product = products.find((p) => p.id === "1"); // Replace with actual order lookup in production
         if (!product) {
+          console.error("Product not found for orderId:", orderId);
           setError("Product not found");
           setLoading(false);
           return;
@@ -72,12 +64,15 @@ export default function Payment() {
 
         const data = await response.json();
         if (data.paymentLink) {
+          console.log(`Redirecting to payment link for orderId: ${orderId}`);
           window.location.href = data.paymentLink; // Redirect to Cashfree
         } else {
+          console.error(`Payment initiation failed for orderId: ${orderId}`, data);
           setError(data.error || "Failed to initiate payment");
           setLoading(false);
         }
       } catch (err: any) {
+        console.error(`Error initiating payment for orderId: ${orderId}`, err);
         setError("An error occurred: " + (err.message || "Unknown error"));
         setLoading(false);
       }
@@ -107,12 +102,9 @@ export default function Payment() {
         </header>
         <main className="container mx-auto p-4">
           <p className="text-red-500">{error}</p>
-          <button
-            onClick={() => router.push(`/checkout?productId=${products[0].id}`)}
-            className="mt-4 bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-          >
+          <Link href={`/checkout?productId=1`} className="mt-4 inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
             Try Again
-          </button>
+          </Link>
         </main>
       </div>
     );
