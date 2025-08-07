@@ -160,12 +160,10 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-blue-600 text-white p-4">
-        <h1 className="text-2xl font-bold text-center">Dealsbe - Checkout</h1>
+        <h1 className="text-2xl font-bold text-center"> Checkout</h1>
       </header>
       <main className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center sm:text-4xl">
-          Product Checkout
-        </h1>
+        
         <div className="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-6">Enter Your Details</h2>
           <form onSubmit={handleProceedToPayment} className="space-y-5">
