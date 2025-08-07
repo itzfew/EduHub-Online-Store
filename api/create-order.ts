@@ -1,0 +1,24 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { v4 as uuidv4 } from "uuid";
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { customerName, email, address, productId } = req.body;
+
+  if (!customerName || !email || !address || !productId) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  // In production, save order to a database
+  const orderId = uuidv4();
+  const order = { id: orderId, customerName, email, address, productId };
+
+  // Simulate saving to database
+  // Replace with actual database logic (e.g., Prisma, MongoDB)
+  console.log("Order created:", order);
+
+  res.status(200).json({ orderId });
+}
