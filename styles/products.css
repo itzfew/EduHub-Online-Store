@@ -40,7 +40,7 @@ body {
 
 /* Navigation Links */
 .nav-link {
-  padding: 10px;
+  padding: 5px;
   font-weight: 500;
   color: var(--dark);
   text-decoration: none;
