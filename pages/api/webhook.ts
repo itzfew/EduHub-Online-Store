@@ -1,18 +1,53 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import crypto from "crypto";
+
+// Mock database (replace with real database in production)
+const orders: {
+  [key: string]: {
+    purchaseId: string;
+    productId: string;
+    productName: string;
+    amount: number;
+    telegramLink: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    telegramUsername: string;
+    customerAddress: string;
+    paymentStatus: string;
+    createdAt: string;
+  };
+} = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
-  // Handle Cashfree webhook notifications
-  // Verify webhook signature in production
   const webhookData = req.body;
+  const signature = req.headers["x-webhook-signature"];
+  const secret = process.env.CASHFREE_WEBHOOK_SECRET;
 
-  console.log("Webhook received:", webhookData);
+  if (!secret) {
+    return res.status(500).json({ success: false, error: "Webhook secret not configured" });
+  }
 
-  // In production, update order status in database
-  // Example: if (webhookData.event === "PAYMENT_SUCCESS") { ... }
+  // Verify signature
+  const computedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(JSON.stringify(webhookData))
+    .digest("base64");
 
-  res.status(200).json({ status: "Webhook received" });
+  if (signature !== computedSignature) {
+    return res.status(401).json({ success: false, error: "Invalid webhook signature" });
+  }
+
+  // Update order status
+  const purchaseId = webhookData.order_id;
+  if (orders[purchaseId]) {
+    orders[purchaseId].paymentStatus = webhookData.order_status || "UNKNOWN";
+    console.log("Webhook updated order:", orders[purchaseId]);
+  }
+
+  return res.status(200).json({ success: true, status: "Webhook received" });
 }
