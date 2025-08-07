@@ -58,7 +58,7 @@ header {
 .nav-links {
   display: flex;
   gap: 2rem; /* Fixed gap between nav items */
-  padding: 0 1rem;
+  padding: 5px;
   overflow-x: auto; /* Allows horizontal scrolling on small screens */
   scrollbar-width: none; /* Hide scrollbar for Firefox */
   -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
