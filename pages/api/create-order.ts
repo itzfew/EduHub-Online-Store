@@ -5,6 +5,7 @@ import axios from "axios";
 const orders: {
   [key: string]: {
     purchaseId: string;
+    orderId: string; // Added to store Cashfree order_id
     productId: string;
     productName: string;
     amount: number;
@@ -54,9 +55,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ success: false, error: "Missing required fields" });
   }
 
+  const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
   // Save to mock database
   orders[purchaseId] = {
     purchaseId,
+    orderId, // Store order_id
     productId,
     productName,
     amount,
@@ -69,8 +73,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     paymentStatus: "unpaid",
     createdAt: new Date().toISOString(),
   };
-
-  const orderId = `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
   try {
     const response = await axios.post(
@@ -86,15 +88,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           customer_phone: customerPhone,
         },
         order_meta: {
-          return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-result?purchase_id=${purchaseId}&item_type=${itemType}`,
+          return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-result?purchase_id=${purchaseId}&item_type=${itemType}&order_id=${orderId}`,
           notify_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhook`,
         },
-        order_note: JSON.stringify({ telegramLink, telegramUsername, customerAddress, purchaseId }),
+        order_note: JSON.stringify({ productId, telegramLink, telegramUsername, customerAddress, purchaseId }),
       },
       {
         headers: {
           "Content-Type": "application/json",
-          "x-api-version": "2022-09-01",
+          "x-api-version": "2023-08-01", // Updated to match payment-result.tsx
           "x-client-id": process.env.CASHFREE_APP_ID,
           "x-client-secret": process.env.CASHFREE_SECRET_KEY,
         },
