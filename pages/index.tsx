@@ -52,7 +52,7 @@ export default function Home({ products }: HomeProps) {
         <div className="header-container">
           <div className="flex items-center justify-center space-x-3">
             <Image
-              src="/logo.jpg" // Updated to use public/logo.jpg
+              src="/logo.jpg" // Using public/logo.jpg
               alt="EduHub Logo"
               width={40}
               height={40}
@@ -79,7 +79,7 @@ export default function Home({ products }: HomeProps) {
               {trendingProducts.map((product) => (
                 <div key={product.id} className="px-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm sm:text-base truncate text-white">
+                    <span className="text-sm sm:text-base text-white product-name">
                       {product.name}
                     </span>
                     <Link href={`/product/${product.id}`}>
@@ -107,7 +107,7 @@ export default function Home({ products }: HomeProps) {
                   height={200}
                   className="product-image w-full h-48 object-cover mb-4 rounded-md"
                 />
-                <h3 className="text-lg font-semibold text-gray-800 truncate text-center mb-2">
+                <h3 className="text-lg font-semibold text-gray-800 text-center mb-2 product-name">
                   {product.name}
                 </h3>
                 <div className="flex items-center justify-center gap-4 mb-4">
