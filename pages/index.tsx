@@ -109,7 +109,7 @@ export default function Home({ products }: HomeProps) {
             <Link href={`/product/${product.id}`} key={product.id} className="block">
               <div className="product-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
                 <Image
-                  src={product Babel
+                  src={product.image} // Fixed: Changed from "product Babel" to "product.image"
                   alt={product.name}
                   width={300}
                   height={200}
