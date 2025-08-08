@@ -59,7 +59,7 @@ export default function Home({ products }: HomeProps) {
         <div className="header-container">
           <div className="flex items-center space-x-3">
             <Image
-              src="/logo.png" // Replace with your logo path
+              src="/..public/logo.png" // Replace with your logo path
               alt="EduHub Logo"
               width={40}
               height={40}
@@ -67,34 +67,21 @@ export default function Home({ products }: HomeProps) {
             />
             <h1 className="text-2xl font-bold">EduHub Online Store</h1>
           </div>
-          <nav className="hidden md:flex nav-links">
-            <Link href="/contact" className="nav-link">
-              Contact
-            </Link>
-            <Link href="/terms" className="nav-link">
-              Terms and Conditions
-            </Link>
-            <Link href="/refund" className="nav-link">
-              Refund Policy
-            </Link>
-          </nav>
           <button className="md:hidden hamburger-btn" onClick={toggleMenu}>
             {isMenuOpen ? "✕" : "☰"}
           </button>
         </div>
-        {isMenuOpen && (
-          <nav className="md:hidden mobile-menu">
-            <Link href="/contact" className="nav-link" onClick={toggleMenu}>
-              Contact
-            </Link>
-            <Link href="/terms" className="nav-link" onClick={toggleMenu}>
-              Terms and Conditions
-            </Link>
-            <Link href="/refund" className="nav-link" onClick={toggleMenu}>
-              Refund Policy
-            </Link>
-          </nav>
-        )}
+        <nav className={`nav-links ${isMenuOpen ? "mobile-menu md:flex" : "hidden md:flex"}`}>
+          <Link href="/contact" className="nav-link" onClick={toggleMenu}>
+            Contact
+          </Link>
+          <Link href="/terms" className="nav-link" onClick={toggleMenu}>
+            Terms and Conditions
+          </Link>
+          <Link href="/refund" className="nav-link" onClick={toggleMenu}>
+            Refund Policy
+          </Link>
+        </nav>
         {/* Trending Products Slider */}
         <section className="trending-slider">
           <div className="container mx-auto">
@@ -122,15 +109,15 @@ export default function Home({ products }: HomeProps) {
             <Link href={`/product/${product.id}`} key={product.id} className="block">
               <div className="product-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
                 <Image
-                  src={product.image}
+                  src={product Babel
                   alt={product.name}
                   width={300}
                   height={200}
                   className="product-image w-full h-48 object-cover mb-4 rounded-md"
                 />
                 <h3 className="text-lg font-semibold text-gray-800 truncate text-center">{product.name}</h3>
-                <p className="text-lg font-bold text-blue-600 text-center">{product.price.toFixed(0)} ₹</p>
-                <div className="flex items-center justify-center mb-4">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <p className="text-xl font-bold text-black">{product.price.toFixed(0)} ₹</p>
                   <span className="rating-box bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">
                     🌟 {getRandomRating()}
                   </span>
