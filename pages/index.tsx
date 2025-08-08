@@ -59,7 +59,7 @@ export default function Home({ products }: HomeProps) {
         <div className="header-container">
           <div className="flex items-center space-x-3">
             <Image
-              src="/..public/logo.png" // Replace with your logo path
+              src="/logo.png" // Replace with your logo path
               alt="EduHub Logo"
               width={40}
               height={40}
