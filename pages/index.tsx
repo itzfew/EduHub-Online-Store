@@ -2,7 +2,6 @@ import { Inter } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
 import { GetStaticProps } from "next";
-import { useState } from "react";
 import Slider from "react-slick";
 
 // Define interfaces for Product
@@ -26,12 +25,6 @@ interface HomeProps {
 }
 
 export default function Home({ products }: HomeProps) {
-  // State for hamburger menu
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Toggle hamburger menu
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
   // Generate random rating (4.0 to 4.9)
   const getRandomRating = () => (4 + Math.random() * 0.9).toFixed(1);
 
@@ -57,9 +50,9 @@ export default function Home({ products }: HomeProps) {
       {/* Navigation Bar */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sticky top-0 z-50 shadow-lg">
         <div className="header-container">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center space-x-3">
             <Image
-              src="/logo.png" // Replace with your logo path
+              src="/logo.jpg" // Updated to use public/logo.jpg
               alt="EduHub Logo"
               width={40}
               height={40}
@@ -67,18 +60,15 @@ export default function Home({ products }: HomeProps) {
             />
             <h1 className="text-2xl font-bold">EduHub Online Store</h1>
           </div>
-          <button className="md:hidden hamburger-btn" onClick={toggleMenu}>
-            {isMenuOpen ? "✕" : "☰"}
-          </button>
         </div>
-        <nav className={`nav-links ${isMenuOpen ? "mobile-menu md:flex" : "hidden md:flex"}`}>
-          <Link href="/contact" className="nav-link" onClick={toggleMenu}>
+        <nav className="nav-links">
+          <Link href="/contact" className="nav-link">
             Contact
           </Link>
-          <Link href="/terms" className="nav-link" onClick={toggleMenu}>
+          <Link href="/terms" className="nav-link">
             Terms and Conditions
           </Link>
-          <Link href="/refund" className="nav-link" onClick={toggleMenu}>
+          <Link href="/refund" className="nav-link">
             Refund Policy
           </Link>
         </nav>
@@ -89,7 +79,9 @@ export default function Home({ products }: HomeProps) {
               {trendingProducts.map((product) => (
                 <div key={product.id} className="px-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm sm:text-base truncate">{product.name}</span>
+                    <span className="text-sm sm:text-base truncate text-white">
+                      {product.name}
+                    </span>
                     <Link href={`/product/${product.id}`}>
                       <button className="view-trending-btn">View</button>
                     </Link>
@@ -109,16 +101,18 @@ export default function Home({ products }: HomeProps) {
             <Link href={`/product/${product.id}`} key={product.id} className="block">
               <div className="product-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
                 <Image
-                  src={product.image} // Fixed: Changed from "product Babel" to "product.image"
+                  src={product.image}
                   alt={product.name}
                   width={300}
                   height={200}
                   className="product-image w-full h-48 object-cover mb-4 rounded-md"
                 />
-                <h3 className="text-lg font-semibold text-gray-800 truncate text-center">{product.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-800 truncate text-center mb-2">
+                  {product.name}
+                </h3>
                 <div className="flex items-center justify-center gap-4 mb-4">
                   <p className="text-xl font-bold text-black">{product.price.toFixed(0)} ₹</p>
-                  <span className="rating-box bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">
+                  <span className="rating-box bg-green-500 text-white text-sm font-medium px-2 py-1 rounded">
                     🌟 {getRandomRating()}
                   </span>
                 </div>
