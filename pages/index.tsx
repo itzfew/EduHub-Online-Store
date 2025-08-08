@@ -2,7 +2,11 @@ import { Inter } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
 import { GetStaticProps } from "next";
-import Slider from "react-slick";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+
+// Dynamically import Slider to disable SSR
+const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
 // Define interfaces for Product
 interface Product {
@@ -75,20 +79,22 @@ export default function Home({ products }: HomeProps) {
         {/* Trending Products Slider */}
         <section className="trending-slider">
           <div className="container mx-auto">
-            <Slider {...sliderSettings}>
-              {trendingProducts.map((product) => (
-                <div key={product.id} className="px-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm sm:text-base text-white product-name">
-                      {product.name}
-                    </span>
-                    <Link href={`/product/${product.id}`}>
-                      <button className="view-trending-btn">View</button>
-                    </Link>
+            <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+              <Slider {...sliderSettings}>
+                {trendingProducts.map((product) => (
+                  <div key={product.id} className="px-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm sm:text-base text-white product-name">
+                        {product.name}
+                      </span>
+                      <Link href={`/product/${product.id}`}>
+                        <button className="view-trending-btn">View</button>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </Slider>
+                ))}
+              </Slider>
+            </Suspense>
           </div>
         </section>
       </header>
