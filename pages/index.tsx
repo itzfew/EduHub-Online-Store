@@ -50,22 +50,22 @@ export default function Home({ products }: HomeProps) {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${inter.className}`}>
+    <div className={`min-h-screen ${inter.className}`}>
       {/* Navigation Bar */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sticky top-0 z-50 shadow-lg">
+      <header className="header">
         <div className="header-container">
-          <div className="flex items-center justify-center space-x-3">
+          <div className="header-title">
             <Image
               src="/logo.jpg" // Using public/logo.jpg
               alt="EduHub Logo"
               width={40}
               height={40}
-              className="object-contain"
+              className="header-logo"
             />
-            <h1 className="text-2xl font-bold">EduHub Online Store</h1>
+            <h1 className="header-title-text">EduHub Online Store</h1>
           </div>
         </div>
-        <nav className="nav-links">
+        <nav className="nav">
           <Link href="/contact" className="nav-link">
             Contact
           </Link>
@@ -77,20 +77,13 @@ export default function Home({ products }: HomeProps) {
           </Link>
         </nav>
         {/* Trending Products Slider */}
-        <section className="trending-slider">
-          <div className="container mx-auto">
-            <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+        <section className="trending">
+          <div className="container">
+            <Suspense fallback={<div className="trending-fallback">Loading...</div>}>
               <Slider {...sliderSettings}>
                 {trendingProducts.map((product) => (
-                  <div key={product.id} className="px-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm sm:text-base text-white product-name">
-                        {product.name}
-                      </span>
-                      <Link href={`/product/${product.id}`}>
-                        <button className="view-trending-btn">View</button>
-                      </Link>
-                    </div>
+                  <div key={product.id} className="trending-slide">
+                    <span className="trending-product-name">{product.name}</span>
                   </div>
                 ))}
               </Slider>
@@ -100,48 +93,44 @@ export default function Home({ products }: HomeProps) {
       </header>
 
       {/* Fresh Recommendations Section */}
-      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="main">
         <h2 className="section-heading">Fresh Recommendations</h2>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="product-grid product-grid-2">
           {products.map((product) => (
-            <Link href={`/product/${product.id}`} key={product.id} className="block">
-              <div className="product-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+            <Link href={`/product/${product.id}`} key={product.id} className="product-link">
+              <div className="product-card">
                 <Image
                   src={product.image}
                   alt={product.name}
                   width={300}
                   height={200}
-                  className="product-image w-full h-48 object-cover mb-4 rounded-md"
+                  className="product-image"
                 />
-                <h3 className="text-lg font-semibold text-gray-800 text-center mb-2 product-name">
-                  {product.name}
-                </h3>
-                <div className="flex items-center justify-center gap-4 mb-4">
-                  <p className="text-xl font-bold text-black">{product.price.toFixed(0)} ₹</p>
-                  <span className="rating-box bg-green-500 text-white text-sm font-medium px-2 py-1 rounded">
-                    🌟 {getRandomRating()}
-                  </span>
+                <h3 className="product-name">{product.name}</h3>
+                <div className="product-info">
+                  <p className="product-price">{product.price.toFixed(0)}₹</p>
+                  <span className="product-rating">🌟 {getRandomRating()}</span>
                 </div>
-                <button className="view-details-btn">View Details</button>
+                <button className="product-button">View Details</button>
               </div>
             </Link>
           ))}
         </div>
 
         {/* Popular Products Section */}
-        <h2 className="section-heading mt-10">Popular Products</h2>
-        <div className="grid grid-cols-3 gap-6">
+        <h2 className="section-heading">Popular Products</h2>
+        <div className="product-grid product-grid-3">
           {popularProducts.map((product) => (
-            <Link href={`/product/${product.id}`} key={product.id} className="block">
-              <div className="popular-card bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+            <Link href={`/product/${product.id}`} key={product.id} className="product-link">
+              <div className="product-card">
                 <Image
                   src={product.image}
                   alt={product.name}
                   width={300}
                   height={200}
-                  className="product-image w-full h-48 object-cover mb-4 rounded-md"
+                  className="product-image"
                 />
-                <button className="view-details-btn">View</button>
+                <button className="product-button">View</button>
               </div>
             </Link>
           ))}
